@@ -1,11 +1,11 @@
 import os
-import openai
+from openai import OpenAI
 import pandas as pd
 from dotenv import load_dotenv
 
 # Load API key
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Parameters to test
 temperatures = [0.0, 0.7, 1.2]
@@ -27,7 +27,7 @@ for model in models:
             for presence_penalty in presence_penalties:
                 for frequency_penalty in frequency_penalties:
                     try:
-                        response = openai.ChatCompletion.create(
+                        response = client.chat.completions.create(
                             model=model,
                             messages=[
                                 {"role": "system", "content": system_prompt},
@@ -38,7 +38,7 @@ for model in models:
                             presence_penalty=presence_penalty,
                             frequency_penalty=frequency_penalty
                         )
-                        output = response.choices[0].message["content"]
+                        output = response.choices[0].message.content
                         results.append({
                             "Model": model,
                             "Temp": temp,
